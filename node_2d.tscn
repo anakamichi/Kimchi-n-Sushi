@@ -1,3 +1,7 @@
-[gd_scene format=3 uid="uid://yw26w3tphfvg"]
+[gd_scene load_steps=2 format=3 uid="uid://yw26w3tphfvg"]
 
-[node name="Node2D" type="Node2D"]
+[ext_resource type="PackedScene" uid="uid://80sq5hjs7dhs" path="res://Enemy/enemy.tscn" id="1_raleo"]
+
+[node name="TestLevel" type="Node2D"]
+
+[node name="Enemy" parent="." instance=ExtResource("1_raleo")]
