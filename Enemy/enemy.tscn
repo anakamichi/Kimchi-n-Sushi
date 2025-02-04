@@ -1,9 +1,236 @@
-[gd_scene load_steps=2 format=3 uid="uid://80sq5hjs7dhs"]
+[gd_scene load_steps=23 format=3 uid="uid://80sq5hjs7dhs"]
+
+[ext_resource type="Texture2D" uid="uid://begil4705vpn5" path="res://Assets/Monsters_Creatures_Fantasy/Flying eye/Flight.png" id="1_8cyl8"]
+[ext_resource type="Texture2D" uid="uid://bbj2pavg55yb0" path="res://Assets/Monsters_Creatures_Fantasy/Flying eye/Death.png" id="1_edqe6"]
+[ext_resource type="Texture2D" uid="uid://cx46lp5nwk5d4" path="res://Assets/Monsters_Creatures_Fantasy/Flying eye/Take Hit.png" id="3_phx5a"]
+
+[sub_resource type="GDScript" id="GDScript_777gm"]
+script/source = "extends CharacterBody2D
+
+class_name FlyingEye
+
+const speed = 50
+var is_eye_chase: bool = true
+
+var health = 2
+var health_max = 2
+var health_min = 0
+
+var dead: bool = false
+var taking_damage: bool = false
+var damage_to_deal = 1
+var is_dealing_damage: bool = false
+
+var dir: Vector2
+const gravity = 900
+var knockback_force = 200
+var is_roaming: bool = true
+
+var player: CharacterBody2D
+var player_in_area = false
+
+func _process(delta):
+	if !is_on_floor():
+		velocity.y += gravity * delta
+		velocity.x = 0
+		
+	##player = Global.playerBody
+	
+	move(delta)
+	handle_animation()
+	move_and_slide()
+
+func move(delta):
+	if !dead:
+		if !is_eye_chase:
+			velocity += dir * speed * delta
+		elif is_eye_chase and !taking_damage:
+			var dir_to_player = position.direction_to(player.position) * speed
+			velocity.x = dir_to_player.x
+		is_roaming = true
+	elif dead:
+		velocity.x = 0	
+
+func handle_animation():
+	var anim_sprite = $AnimatedSprite2D
+	if !dead and !taking_damage and !is_dealing_damage:
+		anim_sprite.play(\"flight\")
+		if dir.x == -1:
+			anim_sprite.flip_h = true
+		elif dir.x == 1:
+			anim_sprite.flip_h = false
+	elif !dead and taking_damage and !is_dealing_damage:
+		anim_sprite.play(\"take_hit\")
+		await get_tree().create_timer(.8).timeout
+		taking_damage = false
+	elif dead and is_roaming:
+		is_roaming = false
+		anim_sprite.play(\"death\")
+		await get_tree().create_timer(1.0).timeout
+		handle_death()
+		
+func handle_death():
+	self.queue_free()
+
+func _on_direction_timer_timeout():
+	$DirectionTimer.wait_time = choose([1.5,2.0,2.5])
+	if !is_eye_chase:
+		dir = choose([Vector2.RIGHT, Vector2.LEFT])
+		velocity.x = 0
+	
+func choose(array):
+	array.shuffle()
+	return array.front()
+"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jikqy"]
+atlas = ExtResource("1_edqe6")
+region = Rect2(0, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lld1s"]
+atlas = ExtResource("1_edqe6")
+region = Rect2(150, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_csse0"]
+atlas = ExtResource("1_edqe6")
+region = Rect2(300, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8uurj"]
+atlas = ExtResource("1_edqe6")
+region = Rect2(450, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fwwip"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(0, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4us3m"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(150, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x8umu"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(300, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p22jr"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(450, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pm88k"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(600, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jqoqt"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(750, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qbjl5"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(900, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hhm4u"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(1050, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_do6hq"]
+atlas = ExtResource("3_phx5a")
+region = Rect2(0, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jughi"]
+atlas = ExtResource("3_phx5a")
+region = Rect2(150, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_blk23"]
+atlas = ExtResource("3_phx5a")
+region = Rect2(300, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ia020"]
+atlas = ExtResource("3_phx5a")
+region = Rect2(450, 0, 150, 150)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_sj83a"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jikqy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lld1s")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_csse0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8uurj")
+}],
+"loop": true,
+"name": &"death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fwwip")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4us3m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x8umu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p22jr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pm88k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jqoqt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qbjl5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hhm4u")
+}],
+"loop": true,
+"name": &"flight",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_do6hq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jughi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_blk23")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ia020")
+}],
+"loop": true,
+"name": &"take_hit",
+"speed": 8.0
+}]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xy268"]
-height = 48.0
+radius = 9.0
+height = 22.0
 
 [node name="Enemy" type="CharacterBody2D"]
+script = SubResource("GDScript_777gm")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_sj83a")
+animation = &"death"
+frame_progress = 0.0832088
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(4, 1)
 shape = SubResource("CapsuleShape2D_xy268")
+
+[node name="DirectionTimer" type="Timer" parent="."]
+process_callback = 0
+autostart = true
+
+[connection signal="timeout" from="DirectionTimer" to="." method="_on_direction_timer_timeout"]
