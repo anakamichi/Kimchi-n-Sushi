@@ -276,7 +276,7 @@ layer_0/tile_data = PackedInt32Array(655373, 65536, 0, 720909, 65536, 1, 655374,
 [node name="FlyingEye" parent="." instance=ExtResource("1_raleo")]
 position = Vector2(282, 109)
 
-[node name="FlyingEye2" parent="." instance=ExtResource("1_raleo")]
+[node name="FlyingEye2(chase)" parent="." instance=ExtResource("1_raleo")]
 position = Vector2(421, 63)
 
 [node name="Goblin" parent="." instance=ExtResource("4_n4fxu")]
