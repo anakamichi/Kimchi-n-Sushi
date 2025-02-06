@@ -10,20 +10,16 @@ config_version=5
 
 [application]
 
-<<<<<<< Updated upstream
-config/name="Kimchi-n-sushi"
+config/name="SamuraiDemo"
+run/main_scene="res://node_2d.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 config/icon="res://icon.svg"
-=======
-config/name="SamuraiDemo"
-run/main_scene="res://scenes/player.tscn"
-config/features=PackedStringArray("4.2", "GL Compatibility")
+<<<<<<<Updatedupstreamconfig/name="Kimchi-n-sushi"
 
 [editor]
 
 version_control/plugin_name="GitPlugin"
 version_control/autoload_on_startup=true
->>>>>>> Stashed changes
 
 [rendering]
 
