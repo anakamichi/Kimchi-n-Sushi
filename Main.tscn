@@ -1,0 +1,63 @@
+[gd_scene load_steps=7 format=3 uid="uid://6ijfkdicm40e"]
+
+[ext_resource type="PackedScene" uid="uid://tv1wajjrooqo" path="res://Art/Stage 1 Asset/Levels/test_level.tscn" id="1_1r75g"]
+[ext_resource type="PackedScene" uid="uid://80sq5hjs7dhs" path="res://Enemy/enemy.tscn" id="2_prmaf"]
+[ext_resource type="PackedScene" uid="uid://qjir30n3q4hm" path="res://Goblin/goblin.tscn" id="3_6r8ok"]
+[ext_resource type="PackedScene" uid="uid://6qkgfhidd3nv" path="res://goblin.tscn" id="4_o1ksy"]
+[ext_resource type="PackedScene" uid="uid://ck1a1haiox86o" path="res://player.tscn" id="5_ns66c"]
+[ext_resource type="Script" path="res://Player_scripts/CharacterBody2D.gd" id="6_xiedl"]
+
+[node name="Main" type="Node2D"]
+position = Vector2(34, 39)
+
+[node name="TestLevel" parent="." instance=ExtResource("1_1r75g")]
+
+[node name="FlyingEye" parent="." instance=ExtResource("2_prmaf")]
+
+[node name="AnimatedSprite2D" parent="FlyingEye" index="0"]
+position = Vector2(87, -95)
+
+[node name="CollisionShape2D" parent="FlyingEye" index="1"]
+position = Vector2(91, -93)
+
+[node name="Goblin" parent="." instance=ExtResource("3_6r8ok")]
+
+[node name="AnimatedSprite2D" parent="Goblin" index="0"]
+position = Vector2(68, -49)
+
+[node name="CollisionShape2D" parent="Goblin" index="1"]
+position = Vector2(70, -39)
+
+[node name="TestLevel2" parent="." instance=ExtResource("4_o1ksy")]
+
+[node name="Player" parent="." instance=ExtResource("5_ns66c")]
+
+[node name="CharacterBody2D" parent="Player" index="0"]
+script = ExtResource("6_xiedl")
+
+[node name="AnimatedSprite2D" parent="Player/CharacterBody2D" index="0"]
+position = Vector2(204, -14)
+
+[node name="CollisionShape2D" parent="Player/CharacterBody2D" index="1"]
+position = Vector2(197.5, -10)
+
+[node name="AttackArea" parent="Player/CharacterBody2D" index="2"]
+position = Vector2(-1, -1)
+
+[node name="CollisionShape_Weak" parent="Player/CharacterBody2D/AttackArea" index="0"]
+position = Vector2(212, -8.5)
+
+[node name="CollisionShape_Strong" parent="Player/CharacterBody2D/AttackArea" index="1"]
+position = Vector2(216, -7)
+
+[node name="CollisionShape_Special" parent="Player/CharacterBody2D/AttackArea" index="2"]
+position = Vector2(219, -7.5)
+
+[node name="Camera2D" parent="Player/CharacterBody2D" index="3"]
+position = Vector2(193, -3.5)
+
+[editable path="TestLevel"]
+[editable path="FlyingEye"]
+[editable path="Goblin"]
+[editable path="TestLevel2"]
+[editable path="Player"]
