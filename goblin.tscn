@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://6qkgfhidd3nv"]
+
+[ext_resource type="Script" path="res://node_2d.gd" id="1_cv8rq"]
+[ext_resource type="PackedScene" uid="uid://80sq5hjs7dhs" path="res://Enemy/enemy.tscn" id="1_raleo"]
+[ext_resource type="PackedScene" uid="uid://qjir30n3q4hm" path="res://Goblin/goblin.tscn" id="4_n4fxu"]
+
+[node name="TestLevel" type="Node2D"]
+position = Vector2(91, 132)
+script = ExtResource("1_cv8rq")
+
+[node name="FlyingEye" parent="." instance=ExtResource("1_raleo")]
+position = Vector2(-1, 253)
+
+[node name="FlyingEye2(chase)" parent="." instance=ExtResource("1_raleo")]
+position = Vector2(-49, 196)
+
+[node name="Goblin" parent="." instance=ExtResource("4_n4fxu")]
+position = Vector2(-61, 437)
