@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d3r7yf0oqw8ev"
-path="res://.godot/imported/Samurai.png-7aaaccca0f50a887f6ecc0c94629dcff.ctex"
+path="res://.godot/imported/Samurai.png-7ff9a2255c8d9e30e8c72a67b6f45ebd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/player/Samurai.png"
-dest_files=["res://.godot/imported/Samurai.png-7aaaccca0f50a887f6ecc0c94629dcff.ctex"]
+source_file="res://assets/player/Samurai.png"
+dest_files=["res://.godot/imported/Samurai.png-7ff9a2255c8d9e30e8c72a67b6f45ebd.ctex"]
 
 [params]
 

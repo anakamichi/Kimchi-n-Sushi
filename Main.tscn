@@ -1,0 +1,51 @@
+[gd_scene load_steps=5 format=3 uid="uid://b016vjvmcwm6t"]
+
+[ext_resource type="PackedScene" uid="uid://ck1a1haiox86o" path="res://scenes/player/player.tscn" id="1_nbdyn"]
+[ext_resource type="Texture2D" uid="uid://d3r7yf0oqw8ev" path="res://assets/player/Samurai.png" id="2_em26m"]
+[ext_resource type="PackedScene" uid="uid://80sq5hjs7dhs" path="res://scenes/enemies/enemy.tscn" id="2_lsrtn"]
+[ext_resource type="PackedScene" uid="uid://tv1wajjrooqo" path="res://scenes/levels/Stage.tscn" id="4_37ecu"]
+
+[node name="Main" type="Node2D"]
+
+[node name="Node2D" parent="." instance=ExtResource("1_nbdyn")]
+
+[node name="AnimatedSprite2D" parent="Node2D/CharacterBody2D" index="0"]
+position = Vector2(26, -16)
+animation = &"weakAttack"
+
+[node name="CollisionShape2D" parent="Node2D/CharacterBody2D" index="1"]
+position = Vector2(22, -15)
+
+[node name="CollisionShape_Weak" parent="Node2D/CharacterBody2D/AttackArea" index="0"]
+position = Vector2(33, -9)
+
+[node name="CollisionShape_Strong" parent="Node2D/CharacterBody2D/AttackArea" index="1"]
+position = Vector2(37, -10)
+
+[node name="CollisionShape_Special" parent="Node2D/CharacterBody2D/AttackArea" index="2"]
+position = Vector2(41, -13)
+
+[node name="Shadow" type="Sprite2D" parent="Node2D/CharacterBody2D" index="4"]
+modulate = Color(0, 0, 0, 1)
+self_modulate = Color(0, 0, 0, 0.196078)
+texture = ExtResource("2_em26m")
+
+[node name="FlyingEye" parent="." instance=ExtResource("2_lsrtn")]
+
+[node name="AnimatedSprite2D" parent="FlyingEye" index="0"]
+position = Vector2(179, -13)
+
+[node name="CollisionShape2D" parent="FlyingEye" index="1"]
+position = Vector2(183, -12)
+
+[node name="StageCollision" parent="." instance=ExtResource("4_37ecu")]
+
+[node name="StageAssets" parent="." instance=ExtResource("4_37ecu")]
+
+[node name="BreakableObstacle" parent="StageAssets" index="1"]
+position = Vector2(1, -2)
+
+[editable path="Node2D"]
+[editable path="FlyingEye"]
+[editable path="StageCollision"]
+[editable path="StageAssets"]
