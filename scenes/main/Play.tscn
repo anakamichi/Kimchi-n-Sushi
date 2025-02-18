@@ -7,7 +7,7 @@
 [ext_resource type="AudioStream" uid="uid://clpr6ekpmffx4" path="res://assets/audio/sfx/strongAttack.mp3" id="5_fwypg"]
 [ext_resource type="AudioStream" uid="uid://c3y8gand2fxyn" path="res://assets/audio/sfx/specialAttack.mp3" id="6_ms3g3"]
 [ext_resource type="PackedScene" uid="uid://80sq5hjs7dhs" path="res://scenes/enemies/enemy.tscn" id="7_04e38"]
-[ext_resource type="Script" path="res://scenes/main/Mushroom.gd" id="8_1c0xb"]
+[ext_resource type="Script" path="res://scripts/enemies/Mushroom.gd" id="8_1c0xb"]
 [ext_resource type="PackedScene" uid="uid://tv1wajjrooqo" path="res://scenes/levels/Stage.tscn" id="8_h1403"]
 [ext_resource type="AudioStream" uid="uid://gkuv8hrwmkbf" path="res://assets/audio/music/PlaySceneBGM.mp3" id="9_4t0sa"]
 [ext_resource type="Texture2D" uid="uid://c2txjcgjfq7ro" path="res://assets/enemies/Mushroom/Idle.png" id="9_it71o"]
