@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://b016vjvmcwm6t"]
+[gd_scene load_steps=27 format=3 uid="uid://b016vjvmcwm6t"]
 
 [ext_resource type="Script" path="res://scripts/main/Play.gd" id="1_m5w2u"]
 [ext_resource type="PackedScene" uid="uid://ck1a1haiox86o" path="res://scenes/player/player.tscn" id="2_j27t7"]
@@ -7,8 +7,112 @@
 [ext_resource type="AudioStream" uid="uid://clpr6ekpmffx4" path="res://assets/audio/sfx/strongAttack.mp3" id="5_fwypg"]
 [ext_resource type="AudioStream" uid="uid://c3y8gand2fxyn" path="res://assets/audio/sfx/specialAttack.mp3" id="6_ms3g3"]
 [ext_resource type="PackedScene" uid="uid://80sq5hjs7dhs" path="res://scenes/enemies/enemy.tscn" id="7_04e38"]
+[ext_resource type="Script" path="res://scenes/main/Mushroom.gd" id="8_1c0xb"]
 [ext_resource type="PackedScene" uid="uid://tv1wajjrooqo" path="res://scenes/levels/Stage.tscn" id="8_h1403"]
 [ext_resource type="AudioStream" uid="uid://gkuv8hrwmkbf" path="res://assets/audio/music/PlaySceneBGM.mp3" id="9_4t0sa"]
+[ext_resource type="Texture2D" uid="uid://c2txjcgjfq7ro" path="res://assets/enemies/Mushroom/Idle.png" id="9_it71o"]
+[ext_resource type="Texture2D" uid="uid://i6h17i2gpjqt" path="res://assets/enemies/Mushroom/Run.png" id="10_h8ys4"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3gi1p"]
+atlas = ExtResource("9_it71o")
+region = Rect2(0, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a17x2"]
+atlas = ExtResource("9_it71o")
+region = Rect2(150, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xlrxy"]
+atlas = ExtResource("9_it71o")
+region = Rect2(300, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qahy7"]
+atlas = ExtResource("9_it71o")
+region = Rect2(450, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vw15u"]
+atlas = ExtResource("10_h8ys4")
+region = Rect2(0, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7egmw"]
+atlas = ExtResource("10_h8ys4")
+region = Rect2(150, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j6r6t"]
+atlas = ExtResource("10_h8ys4")
+region = Rect2(300, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ek1qy"]
+atlas = ExtResource("10_h8ys4")
+region = Rect2(450, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ped1c"]
+atlas = ExtResource("10_h8ys4")
+region = Rect2(600, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dp58n"]
+atlas = ExtResource("10_h8ys4")
+region = Rect2(750, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5aslf"]
+atlas = ExtResource("10_h8ys4")
+region = Rect2(900, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2pew5"]
+atlas = ExtResource("10_h8ys4")
+region = Rect2(1050, 0, 150, 150)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_c6ul7"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3gi1p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a17x2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xlrxy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qahy7")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vw15u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7egmw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j6r6t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ek1qy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ped1c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dp58n")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5aslf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2pew5")
+}],
+"loop": true,
+"name": &"run",
+"speed": 8.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_igdhe"]
+radius = 7.0
+height = 34.0
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_m5w2u")
@@ -53,6 +157,21 @@ position = Vector2(179, -13)
 [node name="CollisionShape2D" parent="FlyingEye" index="1"]
 position = Vector2(183, -12)
 
+[node name="Mushroom" type="CharacterBody2D" parent="."]
+script = ExtResource("8_1c0xb")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Mushroom"]
+position = Vector2(95, 235)
+sprite_frames = SubResource("SpriteFrames_c6ul7")
+animation = &"run"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mushroom"]
+position = Vector2(95, 240)
+shape = SubResource("CapsuleShape2D_igdhe")
+
+[node name="DirectionTimer" type="Timer" parent="Mushroom"]
+autostart = true
+
 [node name="StageCollision" parent="." instance=ExtResource("8_h1403")]
 
 [node name="StageAssets" parent="." instance=ExtResource("8_h1403")]
@@ -63,6 +182,8 @@ position = Vector2(1, -2)
 [node name="BGM_Playing" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("9_4t0sa")
 volume_db = -5.0
+
+[connection signal="timeout" from="Mushroom/DirectionTimer" to="Mushroom" method="_on_direction_timer_timeout"]
 
 [editable path="Node2D"]
 [editable path="FlyingEye"]

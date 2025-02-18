@@ -1,16 +1,16 @@
 [gd_scene load_steps=23 format=3 uid="uid://80sq5hjs7dhs"]
 
-[ext_resource type="Texture2D" uid="uid://begil4705vpn5" path="res://Assets/Monsters_Creatures_Fantasy/Flying eye/Flight.png" id="1_8cyl8"]
-[ext_resource type="Texture2D" uid="uid://bbj2pavg55yb0" path="res://Assets/Monsters_Creatures_Fantasy/Flying eye/Death.png" id="1_edqe6"]
-[ext_resource type="Texture2D" uid="uid://cx46lp5nwk5d4" path="res://Assets/Monsters_Creatures_Fantasy/Flying eye/Take Hit.png" id="3_phx5a"]
+[ext_resource type="Texture2D" uid="uid://begil4705vpn5" path="res://assets/enemies/Flying eye/Flight.png" id="1_8cyl8"]
+[ext_resource type="Texture2D" uid="uid://bbj2pavg55yb0" path="res://assets/enemies/Flying eye/Death.png" id="1_edqe6"]
+[ext_resource type="Texture2D" uid="uid://cx46lp5nwk5d4" path="res://assets/enemies/Flying eye/Take Hit.png" id="3_phx5a"]
 
 [sub_resource type="GDScript" id="GDScript_777gm"]
 script/source = "extends CharacterBody2D
 
-class_name FlyingEye
+#class_name Mushroom
 
-const speed = 50
-var is_eye_chase: bool = false
+const speed = 100
+var is_chase: bool = false
 
 var health = 2
 var health_max = 2
@@ -22,7 +22,7 @@ var damage_to_deal = 1
 var is_dealing_damage: bool = false
 
 var dir: Vector2
-const gravity = 0
+const gravity = 100
 var knockback_force = 200
 var is_roaming: bool = true
 
@@ -30,12 +30,10 @@ var goblin: CharacterBody2D
 var goblin_in_area = false
 
 func _process(delta):
-	if is_on_floor():
+	if !is_on_floor():
 		velocity.y += gravity * delta
 		velocity.x = 0
 		
-	
-	#goblin = Global.playerBody
 	
 	move(delta)
 	handle_animation()
@@ -43,11 +41,15 @@ func _process(delta):
 
 func move(delta):
 	if !dead:
-		if !is_eye_chase:
+		if !is_chase:
 			velocity += dir * speed * delta
-		#elif is_eye_chase and !taking_damage:
-			#var dir_to_player = position.direction_to(goblin.position) * speed
-			#velocity.x = dir_to_player.x
+		elif is_chase and !taking_damage:
+			var dir_to_player = position.direction_to(goblin.position) * speed
+			velocity.x = dir_to_player.x
+			dir.x = abs(velocity.x) / velocity.x
+		elif taking_damage:
+			var knockback_dir = position.direction_to(goblin.position) * knockback_force
+			velocity.x = knockback_dir.x
 		is_roaming = true
 	elif dead:
 		velocity.x = 0	
@@ -55,7 +57,7 @@ func move(delta):
 func handle_animation():
 	var anim_sprite = $AnimatedSprite2D
 	if !dead and !taking_damage and !is_dealing_damage:
-		anim_sprite.play(\"flight\")
+		anim_sprite.play(\"run\")
 		if dir.x == -1:
 			anim_sprite.flip_h = true
 		elif dir.x == 1:
@@ -75,13 +77,23 @@ func handle_death():
 
 func _on_direction_timer_timeout():
 	$DirectionTimer.wait_time = choose([1.5,2.0,2.5])
-	if !is_eye_chase:
+	if !is_chase:
 		dir = choose([Vector2.RIGHT, Vector2.LEFT])
 		velocity.x = 0
 	
 func choose(array):
 	array.shuffle()
 	return array.front()
+	
+func _on_area_entered(area):
+	if area.is_in_group(\"player_detection_area\"): # Use a dedicated area for detection
+		is_chase = true
+
+func _on_area_exited(area):
+	if area.is_in_group(\"player_detection_area\"):
+		is_chase = false
+		is_roaming = true
+		_on_direction_timer_timeout()
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jikqy"]

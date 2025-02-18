@@ -1,0 +1,3 @@
+[gd_scene format=3 uid="uid://idx61rfteu5g"]
+
+[node name="Mushroom" type="CharacterBody2D"]
