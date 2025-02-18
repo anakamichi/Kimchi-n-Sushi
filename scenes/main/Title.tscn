@@ -1,0 +1,38 @@
+[gd_scene load_steps=8 format=3 uid="uid://btxsn5yam8wh0"]
+
+[ext_resource type="Script" path="res://scripts/main/Title.gd" id="1_yrrvn"]
+[ext_resource type="FontFile" uid="uid://0t3parxxbhvc" path="res://assets/fonts/MedievalSharp-Regular.ttf" id="2_1kytf"]
+[ext_resource type="Script" path="res://scripts/main/StartButton.gd" id="3_cknge"]
+[ext_resource type="Texture2D" uid="uid://rhye0m4md8o" path="res://assets/sprites/TitleBackground_resized.webp" id="3_et20d"]
+[ext_resource type="Script" path="res://scripts/main/Sprite2D.gd" id="4_mv6tr"]
+[ext_resource type="AudioStream" uid="uid://sbj7vs6s4ba8" path="res://assets/audio/music/TitleBGM.mp3" id="7_b3jp3"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_tfp0a"]
+
+[node name="TitleScreen" type="Node2D"]
+script = ExtResource("1_yrrvn")
+
+[node name="StartButton" type="Button" parent="."]
+offset_left = 839.0
+offset_top = 764.0
+offset_right = 1011.0
+offset_bottom = 856.0
+theme_override_fonts/font = ExtResource("2_1kytf")
+theme_override_font_sizes/font_size = 74
+toggle_mode = true
+button_group = SubResource("ButtonGroup_tfp0a")
+text = "Start
+"
+script = ExtResource("3_cknge")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+z_index = -1
+position = Vector2(596.5, 327)
+scale = Vector2(1, 0.972)
+texture = ExtResource("3_et20d")
+script = ExtResource("4_mv6tr")
+
+[node name="TitleScreenBGM" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("7_b3jp3")
+volume_db = 16.0
+autoplay = true
