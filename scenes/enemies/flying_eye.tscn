@@ -1,0 +1,378 @@
+[gd_scene load_steps=36 format=3 uid="uid://80sq5hjs7dhs"]
+
+[ext_resource type="Texture2D" uid="uid://fw5m20iwt82" path="res://assets/enemies/Flying eye/Attack.png" id="1_7y4rd"]
+[ext_resource type="Texture2D" uid="uid://begil4705vpn5" path="res://assets/enemies/Flying eye/Flight.png" id="1_8cyl8"]
+[ext_resource type="Texture2D" uid="uid://bbj2pavg55yb0" path="res://assets/enemies/Flying eye/Death.png" id="1_edqe6"]
+[ext_resource type="Texture2D" uid="uid://cx46lp5nwk5d4" path="res://assets/enemies/Flying eye/Take Hit.png" id="3_phx5a"]
+[ext_resource type="Script" path="res://scripts/enemies/mushroom_attackarea.gd" id="5_5mjw4"]
+[ext_resource type="AudioStream" uid="uid://bn76p0p44c2dk" path="res://assets/audio/sfx/FlyingEyeAttack.mp3" id="6_xxrr1"]
+[ext_resource type="AudioStream" uid="uid://dsin67y4q4mkv" path="res://assets/audio/sfx/FlyingEyeDeath.mp3" id="7_4fkx6"]
+
+[sub_resource type="GDScript" id="GDScript_777gm"]
+script/source = "extends CharacterBody2D
+class_name FlyingEye
+
+# Movement constants
+const FLY_SPEED: float = 60.0
+
+# Health parameters
+var health: int = 6
+var health_max: int = 6
+
+# State flags
+var dead: bool = false
+var taking_damage: bool = false
+var is_attacking: bool = false
+
+# Attack cooldown
+var attack_cooldown: float = 2.0
+var attack_timer: float = 0.0
+
+# Chasing ranges
+const START_CHASE_RANGE: float = 200.0
+const STOP_CHASE_RANGE: float = 300.0
+var is_chasing: bool = false
+
+# Roaming direction (needed for horizontal roaming when not chasing)
+var direction: Vector2 = Vector2(1, 0)
+
+# Child nodes references
+@onready var anim_sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var attack_area: Area2D = $AttackArea
+@onready var direction_timer: Timer = $DirectionTimer
+@onready var player = get_node(\"/root/Main/Node2D/CharacterBody2D\")
+
+# Audio SFX references (Attack, Death only)
+@onready var sfxAttack: AudioStreamPlayer2D = $SFX_Attack
+@onready var sfxDeath: AudioStreamPlayer2D = $SFX_Death
+
+func _ready() -> void:
+	attack_timer = attack_cooldown
+	if direction_timer:
+		direction_timer.timeout.connect(_on_DirectionTimer_timeout)
+
+func _physics_process(delta: float) -> void:
+	if dead:
+		velocity = Vector2.ZERO
+	else:
+		# Measure distance to player
+		if player and is_instance_valid(player):
+			var distance_to_player = position.distance_to(player.position)
+			if is_chasing:
+				if distance_to_player > STOP_CHASE_RANGE:
+					is_chasing = false
+			else:
+				if distance_to_player < START_CHASE_RANGE:
+					is_chasing = true
+
+		# If chasing, move toward player's X (and optionally Y)
+		if is_chasing:
+			var dx = player.position.x - position.x
+			velocity.x = sign(dx) * FLY_SPEED
+
+			# If you want vertical chase, uncomment these lines:
+			# var dy = player.position.y - position.y
+			# velocity.y = sign(dy) * FLY_SPEED
+			velocity.y = 0.0
+		else:
+			# Roaming horizontally using 'direction'
+			velocity.x = direction.x * FLY_SPEED
+			velocity.y = 0.0
+
+		# Stop movement if attacking
+		if is_attacking:
+			velocity = Vector2.ZERO
+
+		# Attack only when chasing
+		if is_chasing and attack_timer <= 0.0 and not is_attacking:
+			perform_attack()
+			attack_timer = attack_cooldown
+		else:
+			attack_timer -= delta
+
+	handle_animation()
+	move_and_slide()
+
+func handle_animation() -> void:
+	if dead:
+		if anim_sprite.animation != \"death\":
+			anim_sprite.play(\"death\")
+		return
+
+	if is_attacking:
+		if anim_sprite.animation != \"attack\":
+			anim_sprite.play(\"attack\")
+		return
+	elif taking_damage:
+		if anim_sprite.animation != \"take_hit\":
+			anim_sprite.play(\"take_hit\")
+		return
+	else:
+		if anim_sprite.animation != \"flight\":
+			anim_sprite.play(\"flight\")
+		anim_sprite.flip_h = (velocity.x < 0)
+
+func perform_attack() -> void:
+	is_attacking = true
+	_play_sound(sfxAttack)
+	if attack_area and attack_area.has_method(\"enable_attack\"):
+		attack_area.call_deferred(\"enable_attack\")
+	await get_tree().create_timer(0.3).timeout
+	if attack_area and attack_area.has_method(\"disable_attack\"):
+		attack_area.call_deferred(\"disable_attack\")
+	is_attacking = false
+
+func take_damage(amount: int) -> void:
+	if dead:
+		return
+	health -= amount
+	taking_damage = true
+	await get_tree().create_timer(0.2).timeout
+	taking_damage = false
+	if health <= 0:
+		health = 0
+		dead = true
+		_play_sound(sfxDeath)
+		await get_tree().create_timer(1.0).timeout
+		queue_free()
+
+func _on_DirectionTimer_timeout() -> void:
+	# Flip roaming direction only if not chasing
+	if not is_chasing:
+		direction.x = -direction.x
+
+func _play_sound(audio_player: AudioStreamPlayer2D) -> void:
+	if audio_player:
+		audio_player.play()
+
+"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h46v7"]
+atlas = ExtResource("1_7y4rd")
+region = Rect2(0, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wsfvn"]
+atlas = ExtResource("1_7y4rd")
+region = Rect2(150, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gw6de"]
+atlas = ExtResource("1_7y4rd")
+region = Rect2(300, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_llp0s"]
+atlas = ExtResource("1_7y4rd")
+region = Rect2(450, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cva3o"]
+atlas = ExtResource("1_7y4rd")
+region = Rect2(600, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bedcg"]
+atlas = ExtResource("1_7y4rd")
+region = Rect2(750, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ydrc0"]
+atlas = ExtResource("1_7y4rd")
+region = Rect2(900, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q4qb0"]
+atlas = ExtResource("1_7y4rd")
+region = Rect2(1050, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jikqy"]
+atlas = ExtResource("1_edqe6")
+region = Rect2(0, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lld1s"]
+atlas = ExtResource("1_edqe6")
+region = Rect2(150, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_csse0"]
+atlas = ExtResource("1_edqe6")
+region = Rect2(300, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8uurj"]
+atlas = ExtResource("1_edqe6")
+region = Rect2(450, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_163fb"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(0, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fcryi"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(150, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u0ptu"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(300, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_00ru8"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(450, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iwgwo"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(600, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mgt2n"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(750, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m5ux6"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(900, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qd70c"]
+atlas = ExtResource("1_8cyl8")
+region = Rect2(1050, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_do6hq"]
+atlas = ExtResource("3_phx5a")
+region = Rect2(0, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jughi"]
+atlas = ExtResource("3_phx5a")
+region = Rect2(150, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_blk23"]
+atlas = ExtResource("3_phx5a")
+region = Rect2(300, 0, 150, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ia020"]
+atlas = ExtResource("3_phx5a")
+region = Rect2(450, 0, 150, 150)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_sj83a"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h46v7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wsfvn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gw6de")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_llp0s")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cva3o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bedcg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ydrc0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q4qb0")
+}],
+"loop": true,
+"name": &"attack",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jikqy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lld1s")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_csse0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8uurj")
+}],
+"loop": true,
+"name": &"death",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_163fb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fcryi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u0ptu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_00ru8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iwgwo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mgt2n")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m5ux6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qd70c")
+}],
+"loop": true,
+"name": &"flight",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_do6hq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jughi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_blk23")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ia020")
+}],
+"loop": true,
+"name": &"take_hit",
+"speed": 4.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xy268"]
+radius = 9.0
+height = 22.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xb012"]
+size = Vector2(6, 17)
+
+[node name="FlyingEye" type="CharacterBody2D"]
+script = SubResource("GDScript_777gm")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(-1, -2)
+sprite_frames = SubResource("SpriteFrames_sj83a")
+animation = &"take_hit"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(4, 1)
+shape = SubResource("CapsuleShape2D_xy268")
+
+[node name="DirectionTimer" type="Timer" parent="."]
+process_callback = 0
+one_shot = true
+
+[node name="AttackArea" type="Area2D" parent="."]
+script = ExtResource("5_5mjw4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+position = Vector2(14, 1.5)
+shape = SubResource("RectangleShape2D_xb012")
+
+[node name="SFX_Attack" type="AudioStreamPlayer2D" parent="."]
+position = Vector2(1, 0)
+stream = ExtResource("6_xxrr1")
+
+[node name="SFX_Death" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("7_4fkx6")
+
+[connection signal="timeout" from="DirectionTimer" to="." method="_on_direction_timer_timeout"]

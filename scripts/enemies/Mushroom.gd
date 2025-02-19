@@ -1,36 +1,34 @@
 extends CharacterBody2D
-class_name Goblin
+class_name Mushroom
 
 # ------------------------------
 # Code Comments in English
 # ------------------------------
 # Movement constants
-const SPEED: float = 50.0
-const GRAVITY: float = 100.0
+const SPEED: float = 40.0
+const GRAVITY: float = 80.0
 
 # Health parameters
-var health: int = 20
-var health_max: int = 20
+var health: int = 26
+var health_max: int = 26
 
 # State flags
 var dead: bool = false
 var taking_damage: bool = false
 var is_attacking: bool = false
 
-# Roaming and chase flags
+# Movement variables
+var direction: Vector2 = Vector2(1, 0)
 var is_roaming: bool = true
 var is_chasing: bool = false
-
-# Direction for roaming
-var dir: Vector2 = Vector2.ZERO
 
 # Attack cooldown
 var attack_cooldown: float = 2.0
 var attack_timer: float = 0.0
 
 # Chasing ranges
-const START_CHASE_RANGE: float = 150.0
-const STOP_CHASE_RANGE: float = 300.0
+const START_CHASE_RANGE: float = 120.0
+const STOP_CHASE_RANGE: float = 200.0
 
 # Child nodes references
 @onready var anim_sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -43,7 +41,7 @@ const STOP_CHASE_RANGE: float = 300.0
 @onready var sfxDeath: AudioStreamPlayer2D = $SFX_Death
 
 func _ready() -> void:
-	dir = choose([Vector2.RIGHT, Vector2.LEFT])
+	direction = choose([Vector2.RIGHT, Vector2.LEFT])
 	attack_timer = attack_cooldown
 	if direction_timer:
 		direction_timer.timeout.connect(_on_DirectionTimer_timeout)
@@ -58,7 +56,7 @@ func _physics_process(delta: float) -> void:
 		else:
 			velocity.y = 0
 
-		# Update chase status
+		# Update chase status based on distance to the player
 		if player and is_instance_valid(player):
 			var distance_to_player = position.distance_to(player.position)
 			if is_chasing:
@@ -74,18 +72,16 @@ func _physics_process(delta: float) -> void:
 		if is_chasing:
 			var dx = player.position.x - position.x
 			velocity.x = sign(dx) * SPEED
-		elif is_roaming:
-			velocity.x = dir.x * SPEED
 		else:
-			velocity.x = 0
+			velocity.x = direction.x * SPEED
 
-		# Stop horizontal movement while attacking
+		# If attacking, stop horizontal movement
 		if is_attacking:
 			velocity.x = 0
 
 		# Attack only when chasing
 		if is_chasing and attack_timer <= 0.0 and not is_attacking:
-			attack()
+			perform_attack()
 			attack_timer = attack_cooldown
 		else:
 			attack_timer -= delta
@@ -107,22 +103,23 @@ func handle_animation() -> void:
 		if anim_sprite.animation != "take_hit":
 			anim_sprite.play("take_hit")
 		return
-
-	if velocity.x == 0:
-		if anim_sprite.animation != "idle":
-			anim_sprite.play("idle")
 	else:
-		if anim_sprite.animation != "run":
-			anim_sprite.play("run")
-		anim_sprite.flip_h = (velocity.x < 0)
+		# Idle or run animation
+		if velocity.x == 0:
+			if anim_sprite.animation != "idle":
+				anim_sprite.play("idle")
+		else:
+			if anim_sprite.animation != "run":
+				anim_sprite.play("run")
+			anim_sprite.flip_h = (velocity.x < 0)
 
-func attack() -> void:
+func perform_attack() -> void:
 	is_attacking = true
 	_play_sound(sfxAttack)  # Play attack SFX
-	if attack_area.has_method("enable_attack"):
+	if attack_area and attack_area.has_method("enable_attack"):
 		attack_area.call_deferred("enable_attack")
 	await get_tree().create_timer(0.3).timeout
-	if attack_area.has_method("disable_attack"):
+	if attack_area and attack_area.has_method("disable_attack"):
 		attack_area.call_deferred("disable_attack")
 	is_attacking = false
 
@@ -143,10 +140,7 @@ func take_damage(amount: int) -> void:
 func _on_DirectionTimer_timeout() -> void:
 	# Flip roaming direction only if not chasing
 	if not is_chasing:
-		if dir.x > 0:
-			dir.x = -1
-		else:
-			dir.x = 1
+		direction.x = -direction.x
 
 func choose(array: Array) -> Variant:
 	array.shuffle()
@@ -155,3 +149,4 @@ func choose(array: Array) -> Variant:
 func _play_sound(audio_player: AudioStreamPlayer2D) -> void:
 	if audio_player:
 		audio_player.play()
+
