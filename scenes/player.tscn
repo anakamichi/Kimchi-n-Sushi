@@ -1,12 +1,9 @@
-[gd_scene load_steps=82 format=3 uid="uid://deths5sms0nlx"]
+[gd_scene load_steps=79 format=3 uid="uid://dio4jttb0gmts"]
 
 [ext_resource type="Script" path="res://scripts/player/character_body_2d.gd" id="1_6jcip"]
 [ext_resource type="Texture2D" uid="uid://d3r7yf0oqw8ev" path="res://assets/player/Samurai.png" id="2_admmt"]
 [ext_resource type="Script" path="res://scripts/player/attack_area.gd" id="3_gdk86"]
 [ext_resource type="Script" path="res://scripts/player/camera_2d.gd" id="4_uhr65"]
-[ext_resource type="AudioStream" uid="uid://dr6t3fwxqhqnp" path="res://assets/audio/sfx/weakAttack.mp3" id="5_ulwmc"]
-[ext_resource type="AudioStream" uid="uid://clpr6ekpmffx4" path="res://assets/audio/sfx/strongAttack.mp3" id="6_r5v2l"]
-[ext_resource type="AudioStream" uid="uid://c3y8gand2fxyn" path="res://assets/audio/sfx/specialAttack.mp3" id="7_cfnts"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qp16u"]
 atlas = ExtResource("2_admmt")
@@ -550,65 +547,47 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8yitw"]
-size = Vector2(13.5, 31.875)
+size = Vector2(11, 25)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ysmbc"]
-size = Vector2(35.25, 22.625)
+size = Vector2(19, 7)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3ly2f"]
-size = Vector2(36.5, 20.25)
+size = Vector2(28, 13)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rw88r"]
-size = Vector2(34.5625, 22)
+size = Vector2(33, 20)
 
 [node name="Node2D" type="Node2D"]
 
-[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+[node name="Player" type="CharacterBody2D" parent="."]
 script = ExtResource("1_6jcip")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D"]
-position = Vector2(9.25, -4)
-scale = Vector2(1.20213, 1.3125)
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Player"]
+position = Vector2(14, 2)
 sprite_frames = SubResource("SpriteFrames_yh5xd")
 animation = &"walk"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
-position = Vector2(3, -3)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+position = Vector2(7.5, 5)
 shape = SubResource("RectangleShape2D_8yitw")
 
-[node name="AttackArea" type="Area2D" parent="CharacterBody2D"]
+[node name="AttackArea" type="Area2D" parent="Player"]
 script = ExtResource("3_gdk86")
 
-[node name="CollisionShape_Weak" type="CollisionShape2D" parent="CharacterBody2D/AttackArea"]
-position = Vector2(22, 10)
+[node name="CollisionShape_Weak" type="CollisionShape2D" parent="Player/AttackArea"]
+position = Vector2(22, 6.5)
 shape = SubResource("RectangleShape2D_ysmbc")
 
-[node name="CollisionShape_Strong" type="CollisionShape2D" parent="CharacterBody2D/AttackArea"]
+[node name="CollisionShape_Strong" type="CollisionShape2D" parent="Player/AttackArea"]
 position = Vector2(26, 8)
 shape = SubResource("RectangleShape2D_3ly2f")
 
-[node name="CollisionShape_Special" type="CollisionShape2D" parent="CharacterBody2D/AttackArea"]
-position = Vector2(29, 8)
+[node name="CollisionShape_Special" type="CollisionShape2D" parent="Player/AttackArea"]
+position = Vector2(29, 7.5)
 shape = SubResource("RectangleShape2D_rw88r")
 
-[node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
+[node name="Camera2D" type="Camera2D" parent="Player"]
 position = Vector2(3, 11.5)
 position_smoothing_enabled = true
 script = ExtResource("4_uhr65")
-
-[node name="Shadow" type="Sprite2D" parent="CharacterBody2D"]
-modulate = Color(0, 0, 0, 0.768627)
-self_modulate = Color(0, 0, 0, 0)
-show_behind_parent = true
-z_index = -1
-texture = ExtResource("2_admmt")
-
-[node name="weakAttack" type="AudioStreamPlayer2D" parent="CharacterBody2D"]
-position = Vector2(22, 10)
-stream = ExtResource("5_ulwmc")
-
-[node name="strongAttack" type="AudioStreamPlayer2D" parent="CharacterBody2D"]
-stream = ExtResource("6_r5v2l")
-
-[node name="specialAttack" type="AudioStreamPlayer2D" parent="CharacterBody2D"]
-stream = ExtResource("7_cfnts")

@@ -1,4 +1,5 @@
 extends CharacterBody2D
+class_name Player
 
 # Define player states
 enum PlayerState {
@@ -38,6 +39,8 @@ const SPECIAL_ATTACK_COOLDOWN: float = 1.0
 var was_on_floor: bool = false
 var last_direction: int = 1  # 1 = facing right, -1 = facing left
 
+const HP_BAR_PATH = "/root/Main/HUD/HPBar"
+
 func _ready() -> void:
 	$AnimatedSprite2D.play("idle")
 	$AttackArea.disable_attack()
@@ -47,13 +50,11 @@ func _ready() -> void:
 	$Shadow.texture = $AnimatedSprite2D.sprite_frames.get_frame_texture("idle", 0)
 	$Shadow.modulate = Color(0, 0, 0, 0.196)
 	$Shadow.self_modulate = Color(0, 0, 0)
-	$Shadow.z_index = -1  # Ensures shadow is behind the player
+	$Shadow.z_index = -1
 
-	# Sync shadow with animation
 	$AnimatedSprite2D.frame_changed.connect(_update_shadow)
 	_update_shadow()
 
-	# Set animation loops
 	$AnimatedSprite2D.sprite_frames.set_animation_loop("hurt", false)
 	$AnimatedSprite2D.sprite_frames.set_animation_loop("jump", false)
 	$AnimatedSprite2D.sprite_frames.set_animation_loop("land", false)
@@ -62,42 +63,41 @@ func _ready() -> void:
 	$AnimatedSprite2D.sprite_frames.set_animation_loop("specialAttack", false)
 	$AnimatedSprite2D.sprite_frames.set_animation_loop("death", false)
 
-	# Connect the animation_finished signal
 	$AnimatedSprite2D.animation_finished.connect(_on_AnimatedSprite2D_animation_finished)
 	print("Player Ready! Position:", position)
+
+	if has_node(HP_BAR_PATH):
+		var hp_bar = get_node(HP_BAR_PATH) as ProgressBar
+		hp_bar.max_value = 100
+		hp_bar.value = hp
 
 func _physics_process(delta: float) -> void:
 	if state == PlayerState.DEATH:
 		return
 	
-	# Update cooldowns
 	weak_attack_cooldown = max(0.0, weak_attack_cooldown - delta)
 	strong_attack_cooldown = max(0.0, strong_attack_cooldown - delta)
 	special_attack_cooldown = max(0.0, special_attack_cooldown - delta)
 	
-	# Invincibility
 	if invincible:
 		invincible_timer -= delta
 		if invincible_timer <= 0.0:
 			invincible = false
 
-	# Skip conditions (attacking, taking damage)
 	if state in [PlayerState.WEAK_ATTACK, PlayerState.STRONG_ATTACK, PlayerState.SPECIAL_ATTACK, PlayerState.HURT]:
 		if not is_on_floor():
 			velocity.y += GRAVITY * delta
 		move_and_slide()
 		return
 
-	# Movement input
 	var input_direction: int = 0
 	if Input.is_action_pressed("ui_left"):
 		input_direction -= 1
 	if Input.is_action_pressed("ui_right"):
 		input_direction += 1
 	
-	var running: bool = Input.is_action_pressed("ui_select") # e.g. SHIFT
+	var running: bool = Input.is_action_pressed("ui_select") # SHIFT or something
 
-	# Horizontal movement
 	if input_direction != 0:
 		last_direction = input_direction
 		velocity.x = input_direction * (RUN_SPEED if running else WALK_SPEED)
@@ -112,6 +112,10 @@ func _physics_process(delta: float) -> void:
 			$AnimatedSprite2D.play("idle")
 			_update_shadow()
 
+	# ★★ Flip AttackArea based on last_direction ★★
+	$AttackArea.scale.x = float(last_direction)
+	#  ↑ これにより、CollisionShape_Weak / Strong / Special が左右反転される
+
 	# Jumping
 	if Input.is_action_just_pressed("ui_up") and is_on_floor():
 		velocity.y = JUMP_FORCE
@@ -119,7 +123,7 @@ func _physics_process(delta: float) -> void:
 		$AnimatedSprite2D.play("jump")
 		_update_shadow()
 
-	# Apply gravity & falling
+	# Gravity & fall
 	if not is_on_floor():
 		velocity.y += GRAVITY * delta
 		if velocity.y > 0 and state != PlayerState.FALL:
@@ -190,16 +194,21 @@ func take_damage(amount: int) -> void:
 	else:
 		state = PlayerState.HURT
 		invincible = true
-		invincible_timer = INVINCIBLE_DURATION
+		invincible_timer = 1.0
 		$AnimatedSprite2D.play("hurt")
+
+	if has_node(HP_BAR_PATH):
+		var hp_bar = get_node(HP_BAR_PATH) as ProgressBar
+		hp_bar.value = hp
+
 	_update_shadow()
 
 func die() -> void:
 	state = PlayerState.DEATH
 	$AnimatedSprite2D.play("death")
 	_update_shadow()
-	
-	# Double Jump Variables and Functions
+
+# Double Jump Variables and Functions
 var double_jump_used: bool = false
 
 func _input(event: InputEvent) -> void:
@@ -220,17 +229,14 @@ func _process(delta: float) -> void:
 func _update_shadow() -> void:
 	$Shadow.texture = $AnimatedSprite2D.sprite_frames.get_frame_texture($AnimatedSprite2D.animation, $AnimatedSprite2D.frame)
 	$Shadow.flip_h = $AnimatedSprite2D.flip_h
-	$Shadow.scale = Vector2(1.3, 1.3)  # Keep shadow thick
+	$Shadow.scale = Vector2(1.3, 1.3)
 
-	# Adjust position dynamically based on ground state
 	if is_on_floor():
-		# Keep shadow close to player's feet when on the ground
-		$Shadow.position = Vector2($AnimatedSprite2D.position.x, $AnimatedSprite2D.position.y + 10)
-		$Shadow.modulate = Color(0, 0, 0, 0.5)  # Darker on ground
-	else:
-		# Keep shadow slightly below but aligned properly in the air
 		$Shadow.position = Vector2($AnimatedSprite2D.position.x, $AnimatedSprite2D.position.y + 7)
-		$Shadow.modulate = Color(0, 0, 0, 0.5)  # Lighter in air
+		$Shadow.modulate = Color(0, 0, 0, 0.5)
+	else:
+		$Shadow.position = Vector2($AnimatedSprite2D.position.x, $AnimatedSprite2D.position.y + 7)
+		$Shadow.modulate = Color(0, 0, 0, 0.5)
 
 func _play_attack_sound(attack_type: int) -> void:
 	match attack_type:

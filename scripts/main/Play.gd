@@ -5,7 +5,7 @@ extends Node2D
 
 func _ready():
 	if bgm_player:
-		bgm_player.stream.loop
+		bgm_player.stream.loop = true
 		bgm_player.play() 
 
 
