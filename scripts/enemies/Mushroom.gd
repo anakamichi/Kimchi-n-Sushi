@@ -88,3 +88,7 @@ func _on_area_exited(area):
 		is_roaming = true
 		_on_direction_timer_timeout()
 
+
+
+func _on_direction_timer_2_timeout():
+	pass # Replace with function body.
