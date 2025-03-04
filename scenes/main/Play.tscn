@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://b016vjvmcwm6t"]
+[gd_scene load_steps=9 format=3 uid="uid://b016vjvmcwm6t"]
 
 [ext_resource type="Script" path="res://scripts/main/Play.gd" id="1_m5w2u"]
 [ext_resource type="PackedScene" uid="uid://deths5sms0nlx" path="res://scenes/player/player.tscn" id="2_j27t7"]
 [ext_resource type="PackedScene" uid="uid://80sq5hjs7dhs" path="res://scenes/enemies/flying_eye.tscn" id="7_04e38"]
+[ext_resource type="PackedScene" uid="uid://ci65rm7y3qmn0" path="res://scenes/enemies/knight.tscn" id="8_8l1hl"]
 [ext_resource type="AudioStream" uid="uid://gkuv8hrwmkbf" path="res://assets/audio/music/PlaySceneBGM.mp3" id="9_4t0sa"]
 [ext_resource type="PackedScene" uid="uid://qjir30n3q4hm" path="res://scenes/enemies/goblin.tscn" id="10_75n4n"]
 [ext_resource type="PackedScene" uid="uid://c2yph0i1gnby" path="res://scenes/enemies/mushroom.tscn" id="11_odwgo"]
@@ -93,6 +94,9 @@ position = Vector2(191, 543)
 
 [node name="FlyingEye3" parent="." instance=ExtResource("7_04e38")]
 position = Vector2(76, 1008)
+
+[node name="Knight" parent="." instance=ExtResource("8_8l1hl")]
+position = Vector2(80, 120)
 
 [editable path="Node2D"]
 [editable path="Mushroom"]
