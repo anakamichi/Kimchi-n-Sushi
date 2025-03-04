@@ -1,5 +1,5 @@
 extends CharacterBody2D
-class_name Mushroom
+#class_name Mushroom
 
 # ------------------------------
 # Code Comments in English
