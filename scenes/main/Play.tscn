@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://qjir30n3q4hm" path="res://scenes/enemies/goblin.tscn" id="10_75n4n"]
 [ext_resource type="PackedScene" uid="uid://c2yph0i1gnby" path="res://scenes/enemies/mushroom.tscn" id="11_odwgo"]
 [ext_resource type="PackedScene" uid="uid://tv1wajjrooqo" path="res://scenes/levels/map.tscn" id="12_5qkxj"]
+[ext_resource type="PackedScene" uid="uid://dhahy3skpo2ds" path="res://scenes/levels/Stage1.tscn" id="12_5qkxj"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_m5w2u")
