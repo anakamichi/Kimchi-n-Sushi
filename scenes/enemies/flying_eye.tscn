@@ -13,7 +13,7 @@ script/source = "extends CharacterBody2D
 class_name FlyingEye
 
 # Movement constants
-const FLY_SPEED: float = 60.0
+const FLY_SPEED: float = 50.0
 
 # Health parameters
 var health: int = 6
@@ -71,9 +71,9 @@ func _physics_process(delta: float) -> void:
 			velocity.x = sign(dx) * FLY_SPEED
 
 			# If you want vertical chase, uncomment these lines:
-			# var dy = player.position.y - position.y
-			# velocity.y = sign(dy) * FLY_SPEED
-			velocity.y = 0.0
+			var dy = player.position.y - position.y
+			velocity.y = sign(dy) * FLY_SPEED
+			# velocity.y = 0.0
 		else:
 			# Roaming horizontally using 'direction'
 			velocity.x = direction.x * FLY_SPEED

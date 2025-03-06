@@ -62,11 +62,11 @@ func _physics_process(delta: float) -> void:
 		if player and is_instance_valid(player):
 			var distance_to_player = position.distance_to(player.position)
 			if is_chasing:
-				if distance_to_player > STOP_CHASE_RANGE:
+				if distance_to_player >= STOP_CHASE_RANGE:
 					is_chasing = false
 					is_roaming = true
 			else:
-				if distance_to_player < START_CHASE_RANGE:
+				if  distance_to_player < START_CHASE_RANGE:
 					is_chasing = true
 					is_roaming = false
 
