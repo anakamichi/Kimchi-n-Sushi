@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3 uid="uid://d1y50wxo1awux"]
+
+[ext_resource type="Script" path="res://scripts/main/Stage1_Play.gd" id="1_jem66"]
+[ext_resource type="PackedScene" uid="uid://deths5sms0nlx" path="res://scenes/player/player.tscn" id="2_346mc"]
+[ext_resource type="PackedScene" uid="uid://dhahy3skpo2ds" path="res://scenes/levels/Stage1.tscn" id="3_8h40w"]
+[ext_resource type="AudioStream" uid="uid://gkuv8hrwmkbf" path="res://assets/audio/music/PlaySceneBGM.mp3" id="4_fmcno"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8mkr4"]
+size = Vector2(878, 145)
+
+[node name="Stage" type="Node2D"]
+script = ExtResource("1_jem66")
+
+[node name="NextStageTrigger" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NextStageTrigger"]
+position = Vector2(147, 6859.5)
+shape = SubResource("RectangleShape2D_8mkr4")
+
+[node name="Node2D" parent="." instance=ExtResource("2_346mc")]
+position = Vector2(102, -49)
+
+[node name="Stage1" parent="." instance=ExtResource("3_8h40w")]
+
+[node name="Stage_BGM" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_fmcno")
+volume_db = -5.0
+autoplay = true
+max_distance = 1e+06
+
+[editable path="Stage1"]
